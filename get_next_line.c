@@ -6,7 +6,7 @@
 /*   By: yilin <yilin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 19:43:06 by yilin             #+#    #+#             */
-/*   Updated: 2024/06/17 17:47:33 by yilin            ###   ########.fr       */
+/*   Updated: 2024/06/18 15:18:16 by yilin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char	*get_str(char *data)
 		return (NULL);
 	while (data[len] && data[len] != '\n')
 		len++;
-	new_str = ft_calloc(len + 2, sizeof(char));
+	new_str = ft_calloc(len + (data[len] == '\n') + 1, sizeof(char));
 	if (!new_str)
 		return (NULL);
 	len = 0;
@@ -66,7 +66,7 @@ char	*get_left_str(char *data)
 	}
 	dup_str = ft_calloc((ft_strlen(data) - i + 1), sizeof(char));
 	if (!dup_str)
-		return (NULL);
+		return (free(data), NULL);
 	i += 1;
 	while (data[i])
 	{
@@ -92,16 +92,17 @@ char	*read_n_append(int fd, char *str)
 
 	if (!str)
 		str = ft_calloc(1, 1);
+	if (!str)
+		return (NULL);
 	bytes_read = 1;
 	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!buffer)
+		return (free(str), NULL);
 	while (bytes_read > 0)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
-		{
-			bytes_read = 0;
-			return (NULL);
-		}
+			return (free(str), free(buffer), NULL);
 		buffer[bytes_read] = '\0';
 		str = ft_strjoin(str, buffer);
 		if (ft_strchr(buffer, '\n'))
@@ -130,55 +131,60 @@ char	*get_next_line(int fd)
 	if (!left_data)
 		return (NULL);
 	result = get_str(left_data);
+	if (!result)
+		return (free(left_data), left_data = NULL);
 	left_data = get_left_str(left_data);
 	return (result);
 }
-/*
-#include <stdio.h>
-=========== MAIN A ================
-int main(void)
+
+/* Cleanup function */
+void	ft_cleanup(void)
 {
-	int fd;
-	char	*read_line;
-	int i = 0;
-
-	fd = open("test1.txt", O_RDONLY);
-	while (i < 4)
-	{
-		read_line = get_next_line(fd);
-		printf("%s", read_line);
-		free(read_line);
-		i++;
-	}
-	close(fd);
-	return 0;
+	get_next_line(-42);
 }
-=========== MAIN A ================
-int main(int ac, char *av[])
-{
-	(void)ac;
 
-	char *read_line;
-	int	fd;
-	int i;
+// #include <stdio.h>
+// int main(void)
+// {
+// 	int fd;
+// 	char	*read_line;
+// 	int i = 0;
 
-	i = 0;
-	fd = open(av[1], O_RDONLY);
-	if (fd < 0)
-	{
-		perror("ERROR!");
-		return (1);
-	}
-	while (i < 3)
-	{	
-		read_line = get_next_line(fd);
-		if (read_line == NULL)
-            break;
-		printf("%s", read_line);
-		free(read_line);
-		i++;
-	}
-	close(fd);
-	return (0);
-}
-*/
+// 	fd = open("test1.txt", O_RDONLY);
+// 	while (i < 4)
+// 	{
+// 		read_line = get_next_line(fd);
+// 		printf("%s", read_line);
+// 		free(read_line);
+// 		i++;
+// 	}
+// 	close(fd);
+// 	return 0;
+// }
+// int main(int ac, char *av[])
+// {
+// 	(void)ac;
+
+// 	char *read_line;
+// 	int	fd;
+// 	int i;
+
+// 	i = 0;
+// 	fd = open(av[1], O_RDONLY);
+// 	if (fd < 0)
+// 	{
+// 		perror("ERROR!");
+// 		return (1);
+// 	}
+// 	while (i < 3)
+// 	{	
+// 		read_line = get_next_line(fd);
+// 		if (read_line == NULL)
+//             break;
+// 		printf("%s", read_line);
+// 		free(read_line);
+// 		i++;
+// 	}
+// 	close(fd);
+// 	return (0);
+// }

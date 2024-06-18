@@ -6,12 +6,18 @@
 /*   By: yilin <yilin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 19:43:06 by yilin             #+#    #+#             */
-/*   Updated: 2024/06/17 18:46:42 by yilin            ###   ########.fr       */
+/*   Updated: 2024/06/18 14:57:40 by yilin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
+/* 
+ get str
+ * Extracts a line from the given string.
+ * @str: The original string containing the data read from the file.
+ * Return: A new string containing the extracted line.
+*/
 char	*get_str(char *data)
 {
 	int		len;
@@ -22,7 +28,7 @@ char	*get_str(char *data)
 		return (NULL);
 	while (data[len] && data[len] != '\n')
 		len++;
-	new_str = ft_calloc(len + 2, sizeof(char));
+	new_str = ft_calloc(len + (data[len] == '\n') + 1, sizeof(char));
 	if (!new_str)
 		return (NULL);
 	len = 0;
@@ -36,6 +42,13 @@ char	*get_str(char *data)
 	return (new_str);
 }
 
+/* 
+ get_left_str
+ * Updates the static string with leftover data after extracting a line.
+ * @str: The original string containing the data read from the file.
+ * Return: 
+   A new string with the leftover data or NULL if there is no leftover data.
+*/
 char	*get_left_str(char *data)
 {
 	int		i;
@@ -53,7 +66,7 @@ char	*get_left_str(char *data)
 	}
 	dup_str = ft_calloc((ft_strlen(data) - i + 1), sizeof(char));
 	if (!dup_str)
-		return (NULL);
+		return (free(data), NULL);
 	i += 1;
 	while (data[i])
 	{
@@ -65,6 +78,13 @@ char	*get_left_str(char *data)
 	return (dup_str);
 }
 
+/* 
+ read_n_append (str by str)
+ * Reads data from the file and appends it to the existing string.
+ * @str: The existing string containing previously read data.
+ * @fd: The file descriptor to read from.
+ * Return: The updated string with the newly read data.
+*/
 char	*read_n_append(int fd, char *str)
 {
 	char	*buffer;
@@ -72,16 +92,17 @@ char	*read_n_append(int fd, char *str)
 
 	if (!str)
 		str = ft_calloc(1, 1);
+	if (!str)
+		return (NULL);
 	bytes_read = 1;
 	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!buffer)
+		return (free(str), NULL);
 	while (bytes_read > 0)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
-		{
-			bytes_read = 0;
-			return (NULL);
-		}
+			return (free(str), free(buffer), NULL);
 		buffer[bytes_read] = '\0';
 		str = ft_strjoin(str, buffer);
 		if (ft_strchr(buffer, '\n'))
@@ -109,6 +130,8 @@ char	*get_next_line(int fd)
 	if (!left_data[fd])
 		return (NULL);
 	result = get_str(left_data[fd]);
+	if (!result)
+		return (free(left_data[fd]), left_data[fd] = NULL, NULL);
 	left_data[fd] = get_left_str(left_data[fd]);
 	return (result);
 }

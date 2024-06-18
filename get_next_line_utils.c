@@ -6,7 +6,7 @@
 /*   By: yilin <yilin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 17:28:21 by yilin             #+#    #+#             */
-/*   Updated: 2024/06/17 17:42:27 by yilin            ###   ########.fr       */
+/*   Updated: 2024/06/18 14:52:22 by yilin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ char	*ft_strjoin(char *s1, char *s2)
 		return (NULL);
 	joint_str = (char *)malloc(sizeof(char) * (len1 + len2 + 1));
 	if (!joint_str)
-		return (NULL);
+		return (free(s1), NULL);
 	while (s1[++i])
 		joint_str[j++] = s1[i];
 	i = -1;
@@ -82,6 +82,8 @@ void	*ft_calloc(size_t nmemb, size_t size)
 {
 	void	*ptr;
 
+	if (size && (nmemb / size * size) != nmemb)
+		return (NULL);
 	ptr = malloc(nmemb * size);
 	if (!ptr)
 		return (NULL);

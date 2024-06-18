@@ -6,7 +6,7 @@
 /*   By: yilin <yilin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/04 17:28:13 by yilin             #+#    #+#             */
-/*   Updated: 2024/06/17 17:52:18 by yilin            ###   ########.fr       */
+/*   Updated: 2024/06/18 15:09:06 by yilin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,5 +27,6 @@ char	*ft_strchr(const char *str, int c);
 void	ft_bzero(void *s, size_t n);
 void	*ft_calloc(size_t nmemb, size_t size);
 char	*get_next_line(int fd);
+void	ft_cleanup(void) __attribute__((destructor));
 
 #endif
